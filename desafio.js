@@ -1,6 +1,7 @@
 class ProductManager {
     constructor() {
         this.products = [];
+        this.lastId = 0;
     }
 
     getProducts() {
@@ -8,12 +9,17 @@ class ProductManager {
     }
 
     addProduct(title, description, price, thumbnail, code, stock) {
-        const replyCode = this.products.find(product => product.code === code); // evito que se repita el codigo
-        if (replyCode) {
-            throw new Error('El código del producto ya está en uso.');
+
+        if (!title || !description || !price || !thumbnail || !code || !stock) {
+            throw new Error ('Todos los campos son obligatorios.');
         }
 
-        const id = this.generateUniqueId(); // genero un id único automáticamente
+        const replyCode = this.products.find(product => product.code === code); // evito que se repita el codigo
+        if (replyCode) {
+            throw new Error ('El código del producto ya está en uso.');
+        }
+
+        const id = ++this.lastId; // incremeneto el ultimo Id y lo asigno
 
         const newProduct = { // creo un nuevo producto
             id,
@@ -33,13 +39,9 @@ class ProductManager {
     getProductById(id) { //selecciono unicamente el ID del producto
         const product = this.products.find(product => product.id === id);
         if (!product){
-            throw new Error ('Producto no encontrado.');
+            console.error('Producto no encontrado: '); 
         }
         return product;
-    }
-
-    generateUniqueId() { // definición correcta del método
-        return '_' + Math.random().toString(36).substring(2, 11);
     }
 }
 
@@ -49,7 +51,7 @@ console.log(productManager.getProducts());
 
 try { //agrego un nuevo producto
     const newProduct = productManager.addProduct('Producto 1', 'Descripcion N1', 200, 'Sin imagen', 'zxc456', 20);
-    console.log('¡Prodcuto agregado exitosamente!', newProduct);
+    console.log('¡Producto agregado exitosamente!', newProduct);
 } catch (error) {
     console.error('Error al agregar producto: ', error.message);
 }
@@ -57,11 +59,27 @@ try { //agrego un nuevo producto
 console.log(productManager.getProducts());
 
 try { //compruebo que NO acepte repetir el codigo
-    productManager.addProduct('Producto 2', 'Descripcion N2', 500, 'Sin imagen', 'zxc456', 25);
-    console.log('¡Prodcuto agregado exitosamente!', newProduct);
+    const newProduct = productManager.addProduct('Producto 2', 'Descripcion N2', 500, 'Sin imagen', 'zxc456', 25);
+    console.log('¡Producto agregado exitosamente!', newProduct);
 } catch (error) {
     console.error('Error al agregar producto: ', error.message);
 }
 
-const productId = productManager.getProducts()[0].id; //muestro solo el ID del producto cargado
-console.log('El ID del producto es: ', productId);
+try { //cargo un producto mas de ejemplo
+    const newProduct = productManager.addProduct('Producto 3', 'Descripcion N3', 1000, 'Sin imagen', 'qwe789', 30);
+    console.log('¡Producto agregado exitosamente!', newProduct);
+} catch (error) {
+    console.error('Error al agregar producto: ', error.message);
+}
+
+try { //cargo otro ejemplo para corroborar las validaciones de los campos
+    const newProduct = productManager.addProduct('Producto 4', 'Descripcion 4', 100, 'vbn159', 5); //elimine el campo thumbnail
+    console.log('¡Producto agregado exitosamente!', newProduct);
+} catch (error) {
+    console.error('Error al agregar producto: ', error.message);
+}
+
+console.log(productManager.getProducts());
+
+const productsIds = productManager.getProducts().map(product => product.id); //muestro solo los IDs de los productos agregados
+console.log('Los IDs agregados son: ', productsIds);
