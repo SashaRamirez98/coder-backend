@@ -1,6 +1,6 @@
-const fs = require('fs');
+import { readFileSync, writeFileSync } from 'fs';
 
-class ProductManager {
+export class ProductManager {
     constructor(filePath) {
         this.products = [];
         this.lastId = 0;
@@ -10,7 +10,7 @@ class ProductManager {
 
     loadFromFile() {
         try {
-            const data = fs.readFileSync(this.path, 'utf-8');
+            const data = readFileSync(this.path, 'utf-8');
             this.products = JSON.parse(data);
             // Obtengo el último ID de los productos cargados
             if (this.products.length > 0) {
@@ -23,7 +23,7 @@ class ProductManager {
 
     saveToFile() {
         try {
-            fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+            writeFileSync(this.path, JSON.stringify(this.products, null, 2));
             console.log('Productos guardados en el archivo:', this.path);
         } catch (error) {
             console.error('Error al guardar productos en el archivo:', error);
@@ -86,41 +86,4 @@ class ProductManager {
     }
 }
 
-// Pruebas
-const filePath = './productos.json'; // Ruta del archivo donde se almacenan los productos
-const productManager = new ProductManager(filePath);
-
-console.log("Productos antes de agregar:", productManager.getProducts());
-
-try {
-    const newProduct = productManager.addProduct({
-        title: 'producto prueba',
-        description: 'Este es un producto prueba',
-        price: 200,
-        thumbnail: 'Sin imagen',
-        code: 'abc123',
-        stock: 25
-    });
-    console.log('Producto agregado:', newProduct);
-} catch (error) {
-    console.error('Error al agregar producto: ', error.message);
-}
-
-console.log("Productos después de agregar:", productManager.getProducts());
-
-const productId = productManager.getProducts()[0].id;
-console.log("Producto con ID 1:", productManager.getProductById(productId));
-
-try {
-    const updatedProduct = productManager.updateProduct(productId, { price: 300 });
-    console.log('Producto actualizado:', updatedProduct);
-} catch (error) {
-    console.error('Error al actualizar producto: ', error.message);
-}
-
-try {
-    const deleted = productManager.deleteProduct(productId);
-    console.log('Producto eliminado:', deleted);
-} catch (error) {
-    console.error('Error al eliminar producto: ', error.message);
-}
+export default ProductManager;
